@@ -2,8 +2,62 @@
 
 The base of core UI
 
+## Structure
 
-## Example
+This library is a example of how to use golang's `html/template` to render sites dynamically, the file struture
+
+```
+│  package.json
+│
+├─public
+│  ├─css
+│  ├─img
+│  └─js
+└─templates
+	│ ├─ entry.tmpl
+	│ └─ install.tmpl
+	├─base
+	│ ├─ footer.tmpl
+	│ ├─ header.tmpl
+	│ └─ meta.tmpl
+	├─component
+	│ └─ hello_world.tmpl
+	├─layout
+	│  ├─ layout.tmpl
+	│  └─nav
+	│     └─ nav.tmpl
+	└─page
+		├─ 404.tmpl
+		├─ err.tmpl
+		├─ home.tmpl
+		└─user
+			└─ profile.tmpl
+```
+
+
+## Start Themeing
+
+fork this repo and run
+
+```shell
+make run -p PORT
+```
+
+**Comands**:
+
+```sh
+theme -h
+Usage: theme [options]
+  -f string
+        path to the theme root dir (default "./")
+  -p string
+        the port to listen on (default "8080")
+  -t string
+        theme to serve on (default "plain")
+```
+
+
+## To use and extend the library
 
 ```go
 

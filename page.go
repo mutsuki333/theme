@@ -7,7 +7,9 @@ type Page struct {
 }
 
 //Context Default rendering context
-var Context = Page{}
+var Context = Page{
+	Title: "My Theme",
+}
 
 //InitApp use viper to get configs
 func InitApp() {

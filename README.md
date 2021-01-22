@@ -24,12 +24,12 @@ The file structure :
     │   └── meta.tmpl
     ├── component       # Some other components that could be used by the engin
     │   └── xxx.tmpl
-    ├── entry.tmpl      # The entry point to all page
+    ├── index.tmpl      # The home page when base route hit 
     ├── install.tmpl    # Every tmpl that is not in page folder are treated as standalone site,
-    |                   # which do not share the property in entry.tmpl,
+    |                   # which do not share the property in default.tmpl,
     |                   # standalone pages are favored over pages when route hits
     ├── layout          # Other layout related tmpls
-    │   ├── layout.tmpl
+    │   ├── default.tmpl # The default layout to render
     │   └── nav
     │       └── nav.tmpl
     └── page            # folder for pages, every page is simply redefining the `content` block,

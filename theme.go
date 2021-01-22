@@ -14,8 +14,8 @@ import (
 
 var (
 	FileType = ".tmpl"
-	Entry    = "entry"
-	Index    = "home"
+	Layout   = "default"
+	Home     = "index"
 )
 
 //ModuleDirs path to look for template module files
@@ -113,13 +113,12 @@ func (r *Renderer) Select(theme string) error {
 			return err
 		}
 	}
-	_, err = r.tpl.ParseFiles(filepath.Join(r.tplDir, Entry+FileType))
 	r.FileServer = http.FileServer(http.Dir(filepath.Join(r.Root, r.Theme, "public")))
 	return err
 }
 
 //RenderPage render
-func (r *Renderer) RenderPage(wr io.Writer, path string, data interface{}) error {
+func (r *Renderer) RenderPage(wr io.Writer, path string, data interface{}, layout ...string) error {
 	var err error
 	page, err := r.tpl.Clone()
 	if err != nil {
@@ -129,8 +128,12 @@ func (r *Renderer) RenderPage(wr io.Writer, path string, data interface{}) error
 	if err != nil {
 		return err
 	}
+	lay := Layout
+	if len(layout) > 0 {
+		lay = layout[0]
+	}
 	buf := &bytes.Buffer{}
-	err = page.ExecuteTemplate(buf, Entry, data)
+	err = page.ExecuteTemplate(buf, lay, data)
 	if err != nil {
 		return err
 	}
@@ -166,7 +169,7 @@ func (r *Renderer) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	path := req.URL.Path
 	var err error
 	if path == "/" {
-		err = r.RenderPage(w, Index, Context)
+		err = r.RenderStandalonePage(w, Home, Context)
 	} else if r.HasPath(path) {
 		err = r.RenderPage(w, path, Context)
 	} else if r.HasAsset(path) {

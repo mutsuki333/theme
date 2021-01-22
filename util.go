@@ -1,39 +1,37 @@
 package theme
 
 import (
-	"html/template"
+	"encoding/json"
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"strings"
 )
 
-func findAndParseTemplates(rootDir string) (*template.Template, error) {
-	cleanRoot := filepath.Clean(rootDir)
-	pfx := len(cleanRoot) + 1
-	root := template.New("")
+func getThemeMeta(path string) (pkg map[string]interface{}, err error) {
+	jsonFile, err := os.Open(filepath.Join(path, "package.json"))
+	if err != nil {
+		return
+	}
+	defer jsonFile.Close()
+	byteValue, _ := ioutil.ReadAll(jsonFile)
+	json.Unmarshal([]byte(byteValue), &pkg)
+	return
+}
 
-	err := filepath.Walk(cleanRoot, func(path string, info os.FileInfo, e1 error) error {
-		if !info.IsDir() && strings.HasSuffix(path, ".tmpl") {
-			if e1 != nil {
-				return e1
-			}
+func lsDir(root string) ([]string, error) {
+	var files []string
+	if root == "" {
+		root = "."
+	}
+	fileInfo, err := ioutil.ReadDir(root)
+	if err != nil {
+		return files, err
+	}
 
-			b, e2 := ioutil.ReadFile(path)
-			if e2 != nil {
-				return e2
-			}
-
-			name := path[pfx:]
-			t := root.New(name)
-			_, e2 = t.Parse(string(b))
-			if e2 != nil {
-				return e2
-			}
+	for _, file := range fileInfo {
+		if file.IsDir() {
+			files = append(files, file.Name())
 		}
-
-		return nil
-	})
-
-	return root, err
+	}
+	return files, nil
 }

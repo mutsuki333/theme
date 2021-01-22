@@ -1,67 +1,38 @@
 package main
 
 import (
-	"html/template"
-	"os"
+	"net/http"
+
+	"evan-soft.com/core/theme"
 )
 
 func main() {
-	var err error
-	path := "./plain/templates"
-	t := template.New("")
-	_, err = t.ParseGlob(path + "/base/*.tmpl")
+	renderer, err := theme.Default("")
 	if err != nil {
 		panic(err)
 	}
-	_, err = t.ParseGlob(path + "/layout/*.tmpl")
-	if err != nil {
-		panic(err)
-	}
-	_, err = t.ParseGlob(path + "/component/*.tmpl")
-	if err != nil {
-		panic(err)
-	}
-	_, err = t.ParseGlob(path + "/index.tmpl")
-	if err != nil {
-		panic(err)
-	}
+	//mount the theme render to root
+	http.Handle("/", renderer)
+	//mount the theme render to other path
+	http.Handle("/page/", http.StripPrefix("/page", renderer))
 
-	n, err := t.Clone()
-	if err != nil {
-		panic(err)
-	}
-	_, err = n.ParseFiles(path + "/page/home.tmpl")
-	if err != nil {
-		panic(err)
-	}
-	err = n.ExecuteTemplate(os.Stdout, "index", map[string]interface{}{"Title": "Hello"})
-	if err != nil {
-		panic(err)
-	}
+	//only serve public files from a specific theme
+	http.Handle("/file/", http.StripPrefix("/file", renderer.FileServer))
 
-	n, err = t.Clone()
-	if err != nil {
-		panic(err)
-	}
-	_, err = n.ParseFiles(path + "/page/install.tmpl")
-	if err != nil {
-		panic(err)
-	}
-	err = n.ExecuteTemplate(os.Stdout, "install", map[string]interface{}{"Title": "Hello"})
-	if err != nil {
-		panic(err)
-	}
+	//switch themes
+	http.HandleFunc("/plain", func(rw http.ResponseWriter, r *http.Request) {
+		renderer.Select("plain")
+		rw.Write([]byte("ok"))
+	})
+	http.HandleFunc("/test", func(rw http.ResponseWriter, r *http.Request) {
+		renderer.Select("test")
+		rw.Write([]byte("ok"))
+	})
 
-	n, err = t.Clone()
-	if err != nil {
-		panic(err)
-	}
-	_, err = n.ParseFiles(path + "/page/404.tmpl")
-	if err != nil {
-		panic(err)
-	}
-	err = n.ExecuteTemplate(os.Stdout, "index", map[string]interface{}{"Title": "Hello"})
-	if err != nil {
-		panic(err)
-	}
+	//another theme on different route
+	renderer2 := theme.New("")
+	renderer2.Select("plain")
+	http.Handle("/theme2/", http.StripPrefix("/theme2", renderer))
+
+	http.ListenAndServe(":8080", nil)
 }

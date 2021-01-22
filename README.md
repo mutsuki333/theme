@@ -4,40 +4,47 @@ The base of core UI
 
 ## Structure
 
-This library is a example of how to use golang's `html/template` to render sites dynamically, the file struture
+This library is an example of how to use golang's `html/template` to render sites dynamically, 
+and added some personal thoughts of how to render static pages.
 
-```
-│  package.json
-│
-├─public
-│  ├─css
-│  ├─img
-│  └─js
-└─templates
-	│ ├─ entry.tmpl
-	│ └─ install.tmpl
-	├─base
-	│ ├─ footer.tmpl
-	│ ├─ header.tmpl
-	│ └─ meta.tmpl
-	├─component
-	│ └─ hello_world.tmpl
-	├─layout
-	│  ├─ layout.tmpl
-	│  └─nav
-	│     └─ nav.tmpl
-	└─page
-		├─ 404.tmpl
-		├─ err.tmpl
-		├─ home.tmpl
-		└─user
-			└─ profile.tmpl
-```
+The file structure :
 
+```shell
+# in ./plain/
+.
+├── package.json        # Theme package data, the name must match the dir name
+├── public              # Assets that are served by the server
+│   ├── css
+│   ├── img
+│   └── js
+└── templates           # go templates
+    ├── base            # basic setup for the whole web
+    │   ├── footer.tmpl
+    │   ├── header.tmpl
+    │   └── meta.tmpl
+    ├── component       # Some other components that could be used by the engin
+    │   └── xxx.tmpl
+    ├── entry.tmpl      # The entry point to all page
+    ├── install.tmpl    # Every tmpl that is not in page folder are treated as standalone site,
+    |                   # which do not share the property in entry.tmpl,
+    |                   # standalone pages are favored over pages when route hits
+    ├── layout          # Other layout related tmpls
+    │   ├── layout.tmpl
+    │   └── nav
+    │       └── nav.tmpl
+    └── page            # folder for pages, every page is simply redefining the `content` block,
+        |               # you can also override other blocks in the page tmpl,
+        |               # pages will be accessible from the router. e.g. /user/profile => profile.tmpl
+        ├── 404.tmpl
+        ├── err.tmpl
+        ├── home.tmpl
+        └── user
+            └── profile.tmpl
+```
 
 ## Start Themeing
 
-fork this repo and run
+fork this repo and change the module name in `go.mod` and `cmd/main.go`, then run
 
 ```shell
 make run -p PORT
@@ -55,7 +62,6 @@ Usage: theme [options]
   -t string
         theme to serve on (default "plain")
 ```
-
 
 ## To use and extend the library
 

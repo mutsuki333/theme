@@ -3,7 +3,7 @@ package main
 import (
 	"net/http"
 
-	"evan-soft.com/core/theme"
+	"github.com/mutsuki333/theme"
 )
 
 func main() {

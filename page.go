@@ -7,8 +7,11 @@ type Page struct {
 }
 
 //Context Default rendering context
-var Context = Page{
-	Title: "My Theme",
+var Context = struct {
+	Page
+	// Data map[string]interface{}
+}{
+	Page{Title: "My Web"},
 }
 
 //InitApp use viper to get configs

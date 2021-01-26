@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"os"
 
-	"evan-soft.com/core/theme"
+	"github.com/mutsuki333/theme"
 )
 
 var (

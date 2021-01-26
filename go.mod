@@ -1,3 +1,3 @@
-module evan-soft.com/core/theme
+module github.com/mutsuki333/theme
 
 go 1.15

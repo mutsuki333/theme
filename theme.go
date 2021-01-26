@@ -167,10 +167,12 @@ func (r *Renderer) RenderStandalonePage(wr io.Writer, path string, data interfac
 
 //ServeHTTP serve all file and templates, 404 if notfound
 func (r *Renderer) ServeHTTP(w http.ResponseWriter, req *http.Request) {
-	path := req.URL.Path
+	path := strings.TrimPrefix(req.URL.Path, "/")
 	var err error
-	if path == "/" {
+	if path == "" {
 		err = r.RenderStandalonePage(w, Home, Context)
+	} else if r.HasSPage(path) {
+		err = r.RenderStandalonePage(w, path, Context)
 	} else if r.HasPath(path) {
 		err = r.RenderPage(w, path, Context)
 	} else if r.HasAsset(path) {
@@ -199,6 +201,15 @@ func (r *Renderer) ServeFS(w http.ResponseWriter, req *http.Request) {
 	}
 	w.WriteHeader((http.StatusNotFound))
 
+}
+
+//HasSPage file or path in theme folder
+func (r *Renderer) HasSPage(path string) bool {
+	stats, err := os.Stat(filepath.Join(r.tplDir, path+FileType))
+	if err != nil || stats.IsDir() {
+		return false
+	}
+	return true
 }
 
 //HasPath file or path in theme folder

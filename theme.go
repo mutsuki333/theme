@@ -16,6 +16,7 @@ var (
 	FileType = ".tmpl"
 	Layout   = "default"
 	Home     = "index"
+	SPA      = false
 )
 
 //ModuleDirs path to look for template module files
@@ -174,9 +175,11 @@ func (r *Renderer) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		err = r.RenderPage(w, path, Context)
 	} else if r.HasAsset(path) {
 		r.FileServer.ServeHTTP(w, req)
+	} else if SPA {
+		err = r.RenderStandalonePage(w, Home, Context)
 	} else {
 		ctx := Context
-		w.WriteHeader((http.StatusNotFound))
+		w.WriteHeader(http.StatusNotFound)
 		r.RenderPage(w, "404", ctx)
 	}
 	if err != nil {

@@ -14,12 +14,14 @@ var (
 	port    string
 	root    string
 	theming string
+	SPA     bool
 )
 
 func init() {
 	flag.StringVar(&port, "p", "8080", "the port to listen on")
 	flag.StringVar(&root, "f", "./", "path to the theme root dir")
 	flag.StringVar(&theming, "t", "plain", "theme to serve on")
+	flag.BoolVar(&SPA, "s", false, "serve index file as spa when no page found")
 	flag.Usage = usage
 }
 
@@ -29,6 +31,7 @@ func usage() {
 }
 func main() {
 	flag.Parse()
+	theme.SPA = SPA
 	renderer := theme.New(root)
 	err := renderer.Select(theming)
 	if err != nil {

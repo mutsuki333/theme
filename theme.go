@@ -3,7 +3,6 @@ package theme
 import (
 	"bytes"
 	"errors"
-	"fmt"
 	"html/template"
 	"io"
 	"log"
@@ -55,7 +54,6 @@ func New(root string) *Renderer {
 func (r *Renderer) Themes() []string {
 	var themes []string
 	dirs, err := lsDir(r.Root)
-	fmt.Println(dirs)
 	if err != nil {
 		return themes
 	}

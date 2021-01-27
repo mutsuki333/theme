@@ -6,18 +6,11 @@ import (
 	"fmt"
 	"html/template"
 	"io"
+	"log"
 	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
-)
-
-var (
-	FileType = ".tmpl"
-	Layout   = "default"
-	Home     = "index"
-	SPA      = false
-	Debug    = true
 )
 
 //ModuleDirs path to look for template module files
@@ -31,13 +24,16 @@ type Renderer struct {
 	tpl        *template.Template
 	tplDir     string
 	FileServer http.Handler
+	FileType   string
+	Layout     string
+	Home       string
+	SPA        bool
+	Debug      bool
 }
 
 //Default plain theme
 func Default(root string) (*Renderer, error) {
-	r := &Renderer{
-		Root: root,
-	}
+	r := New(root)
 	err := r.Select("plain")
 	return r, err
 }
@@ -45,7 +41,12 @@ func Default(root string) (*Renderer, error) {
 //New Renderer
 func New(root string) *Renderer {
 	r := &Renderer{
-		Root: root,
+		Root:     root,
+		FileType: ".tmpl",
+		Layout:   "default",
+		Home:     "index",
+		SPA:      false,
+		Debug:    true,
 	}
 	return r
 }
@@ -103,7 +104,7 @@ func (r *Renderer) Select(theme string) error {
 			if err != nil {
 				return err
 			}
-			if !info.IsDir() && strings.HasSuffix(path, FileType) {
+			if !info.IsDir() && strings.HasSuffix(path, r.FileType) {
 				_, err = r.tpl.ParseFiles(path)
 				if err != nil {
 					return err
@@ -126,11 +127,11 @@ func (r *Renderer) RenderPage(wr io.Writer, path string, data interface{}, layou
 	if err != nil {
 		return err
 	}
-	_, err = page.ParseFiles(filepath.Join(r.Root, r.Theme, "templates", "page", path+FileType))
+	_, err = page.ParseFiles(filepath.Join(r.Root, r.Theme, "templates", "page", path+r.FileType))
 	if err != nil {
 		return err
 	}
-	lay := Layout
+	lay := r.Layout
 	if len(layout) > 0 {
 		lay = layout[0]
 	}
@@ -153,7 +154,7 @@ func (r *Renderer) RenderStandalonePage(wr io.Writer, path string, data interfac
 	if err != nil {
 		return err
 	}
-	_, err = page.ParseFiles(filepath.Join(r.Root, r.Theme, "templates", path+FileType))
+	_, err = page.ParseFiles(filepath.Join(r.Root, r.Theme, "templates", path+r.FileType))
 	if err != nil {
 		return err
 	}
@@ -171,23 +172,24 @@ func (r *Renderer) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	path := strings.TrimPrefix(req.URL.Path, "/")
 	var err error
 	if path == "" {
-		err = r.RenderStandalonePage(w, Home, Context)
+		err = r.RenderStandalonePage(w, r.Home, Context)
 	} else if r.HasSPage(path) {
 		err = r.RenderStandalonePage(w, path, Context)
 	} else if r.HasPath(path) {
 		err = r.RenderPage(w, path, Context)
 	} else if r.HasAsset(path) {
 		r.FileServer.ServeHTTP(w, req)
-	} else if SPA {
-		err = r.RenderStandalonePage(w, Home, Context)
+	} else if r.SPA {
+		err = r.RenderStandalonePage(w, r.Home, Context)
 	} else {
 		ctx := Context
 		w.WriteHeader(http.StatusNotFound)
 		r.RenderPage(w, "404", ctx)
 	}
 	if err != nil {
-		ctx := Context.(Page)
+		ctx := Page{}
 		ctx.Error = err.Error()
+		log.Println(err)
 		r.RenderPage(w, "err", ctx)
 	}
 
@@ -206,7 +208,7 @@ func (r *Renderer) ServeFS(w http.ResponseWriter, req *http.Request) {
 
 //HasSPage file or path in theme folder
 func (r *Renderer) HasSPage(path string) bool {
-	stats, err := os.Stat(filepath.Join(r.tplDir, path+FileType))
+	stats, err := os.Stat(filepath.Join(r.tplDir, path+r.FileType))
 	if err != nil || stats.IsDir() {
 		return false
 	}
@@ -215,7 +217,7 @@ func (r *Renderer) HasSPage(path string) bool {
 
 //HasPath file or path in theme folder
 func (r *Renderer) HasPath(path string) bool {
-	stats, err := os.Stat(filepath.Join(r.tplDir, "page", path+FileType))
+	stats, err := os.Stat(filepath.Join(r.tplDir, "page", path+r.FileType))
 	if err != nil || stats.IsDir() {
 		return false
 	}

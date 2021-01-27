@@ -1,5 +1,5 @@
 run:
-	go run cmd/main.go
+	go run cmd/theme/main.go
 
 build:
 	go build -o theme ./cmd/theme/main.go

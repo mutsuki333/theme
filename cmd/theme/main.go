@@ -31,8 +31,8 @@ func usage() {
 }
 func main() {
 	flag.Parse()
-	theme.SPA = SPA
 	renderer := theme.New(root)
+	renderer.SPA = SPA
 	err := renderer.Select(theming)
 	if err != nil {
 		panic(err)

@@ -7,11 +7,17 @@ type Page struct {
 }
 
 //Context Default rendering context
-var Context = struct {
-	Page
-	// Data map[string]interface{}
-}{
-	Page{Title: "My Web"},
+var Context interface{}
+
+func init() {
+	Context = struct {
+		Page
+		Test string
+		// Data map[string]interface{}
+	}{
+		Page: Page{Title: "My Web"},
+		Test: "cool",
+	}
 }
 
 //InitApp use viper to get configs

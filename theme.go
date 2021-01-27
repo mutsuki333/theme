@@ -17,6 +17,7 @@ var (
 	Layout   = "default"
 	Home     = "index"
 	SPA      = false
+	Debug    = true
 )
 
 //ModuleDirs path to look for template module files
@@ -185,7 +186,7 @@ func (r *Renderer) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		r.RenderPage(w, "404", ctx)
 	}
 	if err != nil {
-		ctx := Context
+		ctx := Context.(Page)
 		ctx.Error = err.Error()
 		r.RenderPage(w, "err", ctx)
 	}

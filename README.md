@@ -44,11 +44,8 @@ The file structure :
 
 ## Start Themeing
 
-fork this repo and change the module name in `go.mod` and `cmd/main.go`, then run
-
-```shell
-make run -p PORT
-```
+Install with `go get -u github.com/mutsuki333/theme/cmd/theme`.  
+Copy the folder *plain* and point the path to it.
 
 **Comands**:
 

@@ -5,12 +5,18 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-{{template "header" .}}
+    {{template "header" .}}
+    {{block "head_inject" .}}
+    <link rel="stylesheet" href="/css/main.css">
+    {{end}}
   </head>
   <body>
-{{template "nav" .}}
-{{template "content" .}}
-{{template "footer" .}}
+    <div class="core-content">
+      {{template "nav" .}}
+      {{template "content" .}}
+    </div>
+    {{template "footer" .}}
+    {{block "foot_inject" .}}{{end}}
   </body>
 </html>
 {{- end}}

@@ -56,6 +56,7 @@ Usage: theme [options]
         path to the theme root dir (default "./")
   -p string
         the port to listen on (default "8080")
+  -s    serve index file as spa when no page found
   -t string
         theme to serve on (default "plain")
 ```
